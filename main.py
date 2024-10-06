@@ -1,43 +1,46 @@
 import requests
-import re
 import urllib.parse
 from bs4 import BeautifulSoup
 import argparse
 import sys
 import time
-import os
-from art import text2art  # Importing the art library for ASCII art
-from colorama import Fore, Style, init  # Importing colorama
+from art import text2art
+from colorama import Fore, Style, init
 
 # Initialize colorama
 init(autoreset=True)
 
-# Generate ASCII art for "OffensiveFalcon" using a smaller font
+# ASCII art for "OffensiveFalcon"
 ascii_signature = text2art("""Offensive
-Falcon""", font='Graffiti')  # Set the font to small
-
-# Change color (you can use Fore.RED, Fore.GREEN, etc.)
+Falcon""", font='Graffiti')
 colored_signature = f"{Fore.CYAN}{ascii_signature}{Style.RESET_ALL}"
-
-# Add made by message
 colored_signature += f"{Fore.GREEN}\n                                   Made by Mradul Umrao{Style.RESET_ALL}\n"
-
 print(colored_signature)
 
-
-# Function to load payloads from external file
+# Load payloads from a file
 def load_payloads_from_file(file_path):
     try:
         with open(file_path, 'r') as f:
             payloads = [line.strip() for line in f if line.strip()]
+        if not payloads:
+            raise ValueError("No payloads found in the file.")
         return payloads
     except FileNotFoundError:
-        print(f"File not found: {file_path}")
-        return []
+        print(f"{Fore.RED}Error: File not found: {file_path}{Style.RESET_ALL}")
+        sys.exit(1)
+    except ValueError as ve:
+        print(f"{Fore.RED}Error: {ve}{Style.RESET_ALL}")
+        sys.exit(1)
 
 # Get all forms on the page
 def get_all_forms(url):
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an error for bad responses
+    except requests.RequestException as e:
+        print(f"{Fore.RED}Error while accessing {url}: {e}{Style.RESET_ALL}")
+        sys.exit(1)
+
     soup = BeautifulSoup(response.text, 'html.parser')
     forms = soup.find_all('form')
     return forms
@@ -46,7 +49,7 @@ def get_all_forms(url):
 def get_form_details(form):
     details = {}
     action = form.get('action')
-    method = form.get('method')
+    method = form.get('method', 'GET')  # Default to GET if not specified
     inputs = form.find_all('input')
     details['action'] = action
     details['method'] = method
@@ -70,88 +73,87 @@ def submit_form(form_details, base_url, payload):
         if name:
             data[name] = value
     data['param'] = payload
-    if method.lower() == 'post':
-        response = requests.post(action, data=data)
-    else:
-        response = requests.get(action, params=data)
+
+    try:
+        if method.lower() == 'post':
+            response = requests.post(action, data=data)
+        else:
+            response = requests.get(action, params=data)
+        response.raise_for_status()  # Raise an error for bad responses
+    except requests.RequestException as e:
+        print(f"{Fore.RED}Error while submitting form to {action}: {e}{Style.RESET_ALL}")
+        return None
+
     return response
 
-# Function to test XSS vulnerabilities
+# Check for various vulnerabilities
 def check_xss(url, payload):
-    response = requests.get(url, params={'param': payload})
-    if payload in response.text:
-        return True, response.text
-    return False, None
+    try:
+        response = requests.get(url, params={'param': payload})
+        response.raise_for_status()
+    except requests.RequestException as e:
+        print(f"{Fore.RED}Error while checking XSS: {e}{Style.RESET_ALL}")
+        return False, None
+    return payload in response.text, response.text
 
-# Function to test SQL Injection vulnerabilities
 def check_sql_injection(url, payload):
-    response = requests.get(url, params={'param': payload})
-    if "syntax error" in response.text.lower() or "sql error" in response.text.lower():
-        return True, response.text
-    return False, None
+    try:
+        response = requests.get(url, params={'param': payload})
+        response.raise_for_status()
+    except requests.RequestException as e:
+        print(f"{Fore.RED}Error while checking SQL Injection: {e}{Style.RESET_ALL}")
+        return False, None
+    return "syntax error" in response.text.lower() or "sql error" in response.text.lower(), response.text
 
-# Function to test Command Injection vulnerabilities
 def check_command_injection(url, payload):
-    response = requests.get(url, params={'param': payload})
-    if "ls" in response.text:
-        return True, response.text
-    return False, None
+    try:
+        response = requests.get(url, params={'param': payload})
+        response.raise_for_status()
+    except requests.RequestException as e:
+        print(f"{Fore.RED}Error while checking Command Injection: {e}{Style.RESET_ALL}")
+        return False, None
+    return "ls" in response.text, response.text
 
 # Main function to test for vulnerabilities
-def test_vulnerabilities(url, payloads, vuln_type, verbose=False, output_file=None, timing=1):
+def test_vulnerabilities(url, payloads, vuln_type, verbose=False, output_file=None, suppress_output=False, timing=1):
     result_log = []
 
     def log_result(message):
-        print(message)
+        if not suppress_output:
+            print(message)
         if output_file:
             result_log.append(message)
 
-    log_result(f"Testing URL: {url}")
+    log_result(f"{Fore.YELLOW}Testing URL: {url}{Style.RESET_ALL}")
 
-    # Test XSS vulnerabilities
+    # Test for vulnerabilities
     if vuln_type == 'XSS':
-        log_result("Testing for XSS vulnerabilities:")
-        xss_found = False
+        log_result(f"{Fore.BLUE}--- Testing for XSS vulnerabilities ---{Style.RESET_ALL}")
         for payload in payloads:
             time.sleep(timing)
             found, response_text = check_xss(url, payload)
             if found:
                 log_result(f"XSS vulnerability found with payload: {payload}")
-                log_result(f"Exploited XSS result: {response_text[:500]}")
-                xss_found = True
-        if not xss_found:
-            log_result("No XSS vulnerabilities found.")
-
-    # Test SQL Injection vulnerabilities
+                log_result(f"Response snippet: {response_text[:500]}")
     elif vuln_type == 'SQL':
-        log_result("Testing for SQL Injection vulnerabilities:")
-        sql_found = False
+        log_result(f"{Fore.BLUE}--- Testing for SQL Injection vulnerabilities ---{Style.RESET_ALL}")
         for payload in payloads:
             time.sleep(timing)
             found, response_text = check_sql_injection(url, payload)
             if found:
                 log_result(f"SQL Injection vulnerability found with payload: {payload}")
-                log_result(f"Exploited SQL Injection result: {response_text[:500]}")
-                sql_found = True
-        if not sql_found:
-            log_result("No SQL Injection vulnerabilities found.")
-
-    # Test Command Injection vulnerabilities
+                log_result(f"Response snippet: {response_text[:500]}")
     elif vuln_type == 'CMD':
-        log_result("Testing for Command Injection vulnerabilities:")
-        cmd_found = False
+        log_result(f"{Fore.BLUE}--- Testing for Command Injection vulnerabilities ---{Style.RESET_ALL}")
         for payload in payloads:
             time.sleep(timing)
             found, response_text = check_command_injection(url, payload)
             if found:
                 log_result(f"Command Injection vulnerability found with payload: {payload}")
-                log_result(f"Exploited Command Injection result: {response_text[:500]}")
-                cmd_found = True
-        if not cmd_found:
-            log_result("No Command Injection vulnerabilities found.")
+                log_result(f"Response snippet: {response_text[:500]}")
 
     # Testing forms
-    log_result("Testing forms:")
+    log_result(f"{Fore.BLUE}--- Testing forms on the page ---{Style.RESET_ALL}")
     forms = get_all_forms(url)
     for i, form in enumerate(forms, 1):
         form_details = get_form_details(form)
@@ -159,18 +161,23 @@ def test_vulnerabilities(url, payloads, vuln_type, verbose=False, output_file=No
         for payload in payloads:
             time.sleep(timing)
             response = submit_form(form_details, url, payload)
-            if payload in response.text:
+            if response and payload in response.text:
                 log_result(f"{vuln_type} vulnerability found in form with payload: {payload}")
-                log_result(f"Exploited {vuln_type} form result: {response.text[:500]}")
+                log_result(f"Response snippet: {response.text[:500]}")
 
     # Write to output file
     if output_file:
-        with open(output_file, 'w') as f:
-            f.write("\n".join(result_log))
-        log_result(f"Results written to {output_file}")
+        try:
+            with open(output_file, 'w') as f:
+                f.write("\n".join(result_log))
+            log_result(f"{Fore.GREEN}Results written to {output_file}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}Error writing to file: {e}{Style.RESET_ALL}")
 
-# Function to handle subdomain or specific path scanning
+# Function to handle subdomain or directory scanning
 def handle_subdomain_or_directory(url, subdirectory=None, subdomain=None):
+    # Automatically discover subdomains and directories (placeholder)
+    discovered_urls = []
     if subdirectory:
         return urllib.parse.urljoin(url, subdirectory)
     elif subdomain:
@@ -182,20 +189,20 @@ def handle_subdomain_or_directory(url, subdirectory=None, subdomain=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Vulnerability scanner with external payloads.")
     parser.add_argument("url", help="The target URL to test.")
-    parser.add_argument("--vuln-type", required=True, choices=["XSS", "SQL", "CMD"], help="Type of vulnerability to test for (XSS, SQL, CMD).")
+    parser.add_argument("--vuln-types", nargs='+', required=True, choices=["XSS", "SQL", "CMD"], help="Types of vulnerabilities to test for (XSS, SQL, CMD).")
     parser.add_argument("-o", "--output", help="File to store results.")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose mode.")
-    parser.add_argument("-t", "--timing", type=int, choices=[1, 2, 3, 4, 5], default=3, help="Set timing template like Nmap (1: Paranoid, 5: Aggressive).")
+    parser.add_argument("-t", "--timing", type=int, choices=[1, 2, 3, 4, 5], default=3, help="Set timing template like Nmap.")
     parser.add_argument("-k", "--subdirectory", help="Test a specific subdirectory.")
     parser.add_argument("-s", "--subdomain", help="Test a specific subdomain.")
-    parser.add_argument("--payload-file", help="External payload file to use.", required=True)
+    parser.add_argument("--payload-files", nargs='+', required=True, help="Payload files for each vulnerability type.")
+    parser.add_argument("--suppress-output", action="store_true", help="Suppress terminal output, only save to file.")
 
-    # Display help message
     args = parser.parse_args()
 
-    # Timing map (similar to Nmap timing)
+    # Timing map
     timing_map = {
-        1: 5,   # Paranoid, 5 seconds between requests
+        1: 5,   # Paranoid
         2: 3,   # Sneaky
         3: 1,   # Normal
         4: 0.5, # Fast
@@ -206,10 +213,7 @@ if __name__ == "__main__":
     # Adjust URL for subdirectory or subdomain if specified
     url = handle_subdomain_or_directory(args.url, args.subdirectory, args.subdomain)
 
-    # Load payloads from the specified file
-    payloads = load_payloads_from_file(args.payload_file)
-    if not payloads:
-        sys.exit("No payloads found. Please provide a valid payload file.")
-
-    # Test vulnerabilities
-    test_vulnerabilities(url, payloads, args.vuln_type, args.verbose, args.output, timing)
+    # Loop through vulnerability types and payload files
+    for vuln_type, payload_file in zip(args.vuln_types, args.payload_files):
+        payloads = load_payloads_from_file(payload_file)
+        test_vulnerabilities(url, payloads, vuln_type, args.verbose, args.output, args.suppress_output, timing)
