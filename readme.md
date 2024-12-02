@@ -30,22 +30,22 @@ Disclaimer
 The tools and scripts in this repository are for educational and research purposes only. Use at your own risk. We are not responsible for any damage or consequences resulting from the use of these tools.
 Getting Started
 
-    Clone our repository using git clone https://github.com/OffensiveFalcon/OffensiveFalcon.git
+    Clone our repository using git clone https://github.com/OffensiveFalcon/OffensiveScripts.git
     Explore our projects and scripts, and start contributing!
 
 <h3><strong>Stay Connected</strong></h3>
 
 Follow us on social media to stay up-to-date with the latest news and updates from OffensiveFalcon:
 
-    Twitter: @OffensiveFalcon
-    LinkedIn: OffensiveFalcon
+    X: @OffensiveFalcon
+    Instagram: OffensiveFalcon
 
 <h3><strong>Acknowledgments</strong></h3>
 
 We would like to thank our contributors, collaborators, and the open source community for their support and contributions to OffensiveFalcon.
 Contact
 
-For questions, feedback, or to report issues, please contact us at offensivefalcon@github.com.
+For questions, feedback, or to report issues, please contact us at offensivefalcon@gmail.com.
 
 Thank you for visiting OffensiveFalcon!
 <hr>
